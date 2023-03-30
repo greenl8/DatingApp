@@ -28,8 +28,7 @@
               "node_modules/bootswatch/dist/united/bootstrap.css",
               "src/styles.css",
               "node_modules/ngx-toastr/toastr.css",
-              "node_modules/font-awesome/css/font-awesome.css",
-              "node_modules/ngx-spinner/animations/ball-scale-multiple.css"
+              "node_modules/font-awesome/css/font-awesome.css"
             ],
             "scripts": []
           },
