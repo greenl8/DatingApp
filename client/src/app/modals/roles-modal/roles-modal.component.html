@@ -10,15 +10,15 @@
             <input type="checkbox"
                 class="form-check-input"
                 [checked]="selectedRoles.includes(role)"
-                value="role.name"
+                value="role"
                 (change)="updateChecked(role)"
-                [disabled]="role.name === 'Admin' && user.username === 'admin'"
+                [disabled]="role === 'Admin' && username === 'admin'"
             >
-            <label>{{role.name}}</label>
+            <label>{{role}}</label>
         </div>
     </form>
   </div>
   <div class="modal-footer">
     <button type="button" class="btn btn-default" (click)="bsModalRef.hide()">Cancel</button>
-    <button type="button" class="btn btn-success">Submit</button>
+    <button type="button" class="btn btn-success" (click)="bsModalRef.hide()">Submit</button>
   </div>
