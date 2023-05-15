@@ -9,6 +9,7 @@ using API.Entities;
 using API.Extensions;
 using API.Helpers;
 using API.Interfaces;
+using API.Services;
 using AutoMapper;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -20,13 +21,13 @@ namespace API.Controllers
     public class UsersController : BaseApiController
     {
         private readonly IMapper _mapper;
-        public IPhotoService _photoService { get; }
         private readonly IUnitOfWork _uow;
+        private readonly IPhotoService _photoService;
         
         public UsersController(IUnitOfWork uow, IMapper mapper, IPhotoService photoService)
         {
-            _uow = uow;
             _photoService = photoService;
+            _uow = uow;
             _mapper = mapper;
            
         }
@@ -58,8 +59,9 @@ namespace API.Controllers
         [HttpGet("{username}")]
         public async Task<ActionResult<MemberDto>> GetUser(string username)
         {
-            return await _uow.UserRepository.GetMemberAsync(username);
-            
+            var currentUsername = User.GetUsername();
+            return await _uow.UserRepository.GetMemberAsync(username,
+            isCurrentUser: currentUsername == username);
         }
 
 
@@ -80,7 +82,6 @@ namespace API.Controllers
         public async Task<ActionResult<PhotoDto>> AddPhoto(IFormFile file)
         {
             var user = await _uow.UserRepository.GetUserByUsernameAsync(User.GetUsername());
-            if(user == null) return NotFound();
 
             var result = await _photoService.AddPhotoAsync(file);
 
@@ -91,7 +92,6 @@ namespace API.Controllers
                 PublicId = result.PublicId
             };
 
-            if(user.Photos.Count == 0) photo.IsMain = true;
 
             user.Photos.Add(photo);
 
@@ -131,8 +131,7 @@ namespace API.Controllers
         public async Task<ActionResult> DeletePhoto(int photoId)
         {
             var user = await _uow.UserRepository.GetUserByUsernameAsync(User.GetUsername());
-
-            var photo = user.Photos.FirstOrDefault(x => x.Id == photoId);
+            var photo = await _uow.PhotoRepository.GetPhotoById(photoId);
 
             if(photo == null) return NotFound();
 
@@ -150,5 +149,6 @@ namespace API.Controllers
 
             return BadRequest("Problem deleting photo");
         }
+
     }
 }
